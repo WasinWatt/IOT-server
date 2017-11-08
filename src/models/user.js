@@ -23,7 +23,7 @@ const User = new mongoose.Schema({
     type: String,
     index: true
   },
-  rfid_id: {
+  rfid: {
     type: String,
     unique: true
   }

@@ -13,7 +13,7 @@ async function authenticateUser (values) {
   return _.pick(user, filteredUserKeys)
 }
 
-async function signUp (values) {
+async function register (values) {
   const dupUser = await User.findByEmail(values.email)
   if (dupUser) {
     const err = new Error('This email is already a user')
@@ -38,6 +38,6 @@ async function findByEmail (email) {
 
 module.exports = {
   authenticateUser,
-  signUp,
+  register,
   findByEmail
 }

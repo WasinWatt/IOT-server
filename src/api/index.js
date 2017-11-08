@@ -14,7 +14,7 @@ let newestRfid
 export default ({ config, db }) => {
   let api = Router()
 
-  const readNewRFID = (eventType, filename) => {
+  function readNewRFID (eventType, filename) {
     return new Promise((resolve, reject) => {
       if (filename) {
         fs.readFile(dataPath, 'utf-8', (err, data) => {
@@ -22,7 +22,6 @@ export default ({ config, db }) => {
             reject(err)
           } else {
             const datas = _.split(data, '\n')
-            console.log(datas)
             resolve(datas[datas.length - 2])
           }
         })
@@ -30,18 +29,20 @@ export default ({ config, db }) => {
     })
   }
 
-  api.get('/rfid-register', (req, res) => {
+  api.get('/rfid-register', (req, res, next) => {
     fs.watch(dataPath, async (eventType, filename) => {
       newestRfid = await readNewRFID(eventType, filename)
-      console.log(newestRfid)
-      res.json({ success: true })
+      if (newestRfid) {
+        res.json({ success: true })
+      }
     })
   })
 
   api.post('/register', async (req, res) => {
     try {
       const body = req.body
-      const newUser = await AuthService.signUp(body)
+      body.rfid = newestRfid
+      const newUser = await AuthService.register(body)
       res.json(_.pick(newUser, filteredUserKeys))
     } catch (error) {
       res.status(error.status).send(error.message)
